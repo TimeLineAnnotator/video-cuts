@@ -8,8 +8,6 @@ with open('labels.csv', 'r', newline='') as f:
     for scene_number, label in reader:
         scene_number_to_label[scene_number] = label
 
-    print(scene_number_to_label)
-
 hierarchies_with_labels = []
 with open('hierarchies.csv', 'r', newline='') as f:
     reader = csv.reader(f)

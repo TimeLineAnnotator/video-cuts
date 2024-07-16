@@ -38,13 +38,11 @@ def download(url, filename):
 def split_scenes(path: str):
     args = ['scenedetect', '-i', path, 'list-scenes', 'save-images', '-n', '1']
     # args += ['time', '--start', '0s', '--end', '10s']  # use these args for testing on parts of the video
-    subprocess.run(args, shell=True)
-
+    p = subprocess.run(args, shell=True)
+    return p.returncode
 
 def move_split_output_to_separate_folder(filename):
     files_to_move = Path().glob(f"{filename}*")
-
-    print(files_to_move)
 
     dir = Path(filename)
     dir.mkdir(exist_ok=True)
@@ -60,7 +58,7 @@ def move_split_output_to_separate_folder(filename):
     files_to_rename = dir.glob(filename + '-*')
 
     for path in files_to_rename:
-        new_path = dir / path.name.replace(filename, '')
+        new_path = dir / path.name.replace(filename + '-', '')
         try:
             os.replace(path, new_path)
         except OSError:
@@ -78,7 +76,6 @@ def generate_tilia_csvs(filename):
             scene_number = row[0]
             start_time = convert_timecode_to_seconds(row[2])
             end_time = convert_timecode_to_seconds(row[5])
-            print(start_time, end_time, 1, scene_number)
             hierarchy_data.append([start_time, end_time, 1, scene_number])
 
     with open(dir / 'hierarchies.csv', 'w', newline='') as csvfile:
@@ -110,9 +107,16 @@ def process_yt_url(url, filename):
 
 
 def process_local_file(filename):
-    split_scenes(filename)
+    if filename.endswith('.mp4'):
+        filename = filename[:-4]
+    print('Processing ' + filename + '.')
+    returncode = split_scenes(filename + '.mp4')
+    if returncode != 0:
+        print('Failed to split video.')
+        return
     move_split_output_to_separate_folder(filename)
     generate_tilia_csvs(filename)
+    print('Finished processing ' + filename + '.')
 
 
 if __name__ == "__main__":
