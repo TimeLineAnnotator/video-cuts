@@ -5,8 +5,7 @@ from process_file import process_local_file
 filename = 'beethoven-op2-no1'
 process_local_file(filename)
 ```
-
-This runs the cut detection algorithm and creates a folder named `filename` with:
+The video file to be processed must be in same directory from which the script is being run. The code above runs the cut detection algorithm and creates a folder named `filename` with:
 - `hierarchies.csv`: a CSV for importing a hierarchy timeline for the video cuts
 - `labels.csv`: placeholders for the instrument names
 - Images of the first frame of each cut, named `Scene-<scene_num>-01.jpg`
