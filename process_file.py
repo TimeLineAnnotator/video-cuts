@@ -6,6 +6,7 @@ from pathlib import Path
 import scenedetect
 from pytube import YouTube
 import csv
+from insert_labels_into_hierarchies import merge
 
 
 def sizeof_fmt(num, suffix="B"):
@@ -106,9 +107,7 @@ def process_yt_url(url, filename):
     generate_tilia_csvs(filename)
 
 
-def process_local_file(filename):
-    if filename.endswith('.mp4'):
-        filename = filename[:-4]
+def process_local_file(filename) -> Path:
     print('Processing ' + filename + '.')
     returncode = split_scenes(filename + '.mp4')
     if returncode != 0:
@@ -116,8 +115,15 @@ def process_local_file(filename):
         return
     move_split_output_to_separate_folder(filename)
     generate_tilia_csvs(filename)
-    print('Finished processing ' + filename + '.')
+    print('Finished processing ' + filename + '.\n\n')
+    return Path(filename)
 
 
 if __name__ == "__main__":
-    get_video_and_cut_times()
+    filename = input("filename: ")
+    filename = filename.split(".mp4")[0]
+    dir = process_local_file(filename)
+    while input("Proceed with merge? (Y/n)") not in {"", "Y", "y"}:
+        pass
+
+    merge(dir)
